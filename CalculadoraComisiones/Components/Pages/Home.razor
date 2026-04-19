@@ -1,0 +1,177 @@
+@page "/"
+@using System.ComponentModel.DataAnnotations
+@inject ICommissionCalculatorService CommissionCalculatorService
+
+<PageTitle>Calculadora de Comisiones</PageTitle>
+
+<section class="hero-card">
+    <h2>Calculadora de Comisiones de Ventas</h2>
+    <p>
+        Ingresa ventas, descuentos y país para obtener la comisión neta en tiempo real.
+        Las reglas implementadas siguen el caso de negocio: India (10%), Estados Unidos (15%) y Reino Unido (12%).
+    </p>
+</section>
+
+<section class="workspace-grid">
+    <article class="panel">
+        <h3>Datos de Entrada</h3>
+
+        <EditForm EditContext="_editContext" OnValidSubmit="CalculateCommission" OnInvalidSubmit="HandleInvalidSubmit" FormName="commission-form">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="field-grid">
+                <label for="country">País</label>
+                <InputSelect id="country" @bind-Value="_formModel.Country">
+                    <option value="">Selecciona un país</option>
+                    @foreach (var country in _supportedCountries)
+                    {
+                        <option value="@country">@country.ToDisplayName()</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => _formModel.Country" />
+            </div>
+
+            <div class="field-grid">
+                <label for="sales">Ventas Totales</label>
+                <InputNumber id="sales" @bind-Value="_formModel.TotalSales" />
+                <ValidationMessage For="() => _formModel.TotalSales" />
+            </div>
+
+            <div class="field-grid">
+                <label for="discounts">Descuentos</label>
+                <InputNumber id="discounts" @bind-Value="_formModel.Discounts" />
+                <ValidationMessage For="() => _formModel.Discounts" />
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(_errorMessage))
+            {
+                <p class="service-error">@_errorMessage</p>
+            }
+
+            <div class="actions">
+                <button type="submit" class="btn-primary">Calcular Comisión</button>
+                <button type="button" class="btn-secondary" @onclick="ResetForm">Limpiar</button>
+            </div>
+        </EditForm>
+    </article>
+
+    <article class="panel result-panel">
+        <h3>Resultado</h3>
+
+        @if (_result is null)
+        {
+            <p class="placeholder">
+                Completa el formulario y presiona <strong>Calcular Comisión</strong> para ver el resultado.
+            </p>
+        }
+        else
+        {
+            <dl class="result-grid">
+                <dt>País</dt>
+                <dd>@_result.Country.ToDisplayName() (@_result.Country.ToCountryCode())</dd>
+
+                <dt>Ventas Totales</dt>
+                <dd>@FormatCurrency(_result.TotalSales)</dd>
+
+                <dt>Descuentos</dt>
+                <dd>@FormatCurrency(_result.Discounts)</dd>
+
+                <dt>Monto Neto</dt>
+                <dd>@FormatCurrency(_result.NetSales)</dd>
+
+                <dt>Tasa de Comisión</dt>
+                <dd>@($"{_result.CommissionRate:P0}")</dd>
+
+                <dt>Comisión Calculada</dt>
+                <dd class="amount">@FormatCurrency(_result.CommissionAmount)</dd>
+            </dl>
+
+            <p class="formula">
+                Fórmula aplicada: <code>(Ventas Totales - Descuentos) x Tasa del País</code>
+            </p>
+        }
+    </article>
+</section>
+
+@code {
+    private CommissionFormModel _formModel = new();
+    private EditContext _editContext = default!;
+    private readonly SalesCountry[] _supportedCountries = Enum.GetValues<SalesCountry>();
+    private SalesCommissionResult? _result;
+    private string? _errorMessage;
+
+    protected override void OnInitialized()
+    {
+        ResetForm();
+    }
+
+    private void CalculateCommission()
+    {
+        _errorMessage = null;
+
+        if (!_formModel.Country.HasValue)
+        {
+            _result = null;
+            return;
+        }
+
+        try
+        {
+            var request = new SalesCommissionRequest(
+                TotalSales: _formModel.TotalSales ?? 0m,
+                Discounts: _formModel.Discounts ?? 0m,
+                Country: _formModel.Country.Value);
+
+            _result = CommissionCalculatorService.Calculate(request);
+        }
+        catch (InvalidOperationException exception)
+        {
+            _result = null;
+            _errorMessage = exception.Message;
+        }
+    }
+
+    private void HandleInvalidSubmit(EditContext _)
+    {
+        _result = null;
+        _errorMessage = null;
+    }
+
+    private void ResetForm()
+    {
+        _formModel = new CommissionFormModel();
+        _editContext = new EditContext(_formModel);
+        _result = null;
+        _errorMessage = null;
+    }
+
+    private static string FormatCurrency(decimal value)
+    {
+        return value.ToString("N2");
+    }
+
+    private sealed class CommissionFormModel : IValidatableObject
+    {
+        [Required(ErrorMessage = "Selecciona un país.")]
+        public SalesCountry? Country { get; set; }
+
+        [Required(ErrorMessage = "Ingresa el monto de ventas totales.")]
+        [Range(typeof(decimal), "0", "79228162514264337593543950335", ErrorMessage = "Las ventas totales deben ser mayores o iguales a 0.")]
+        public decimal? TotalSales { get; set; }
+
+        [Required(ErrorMessage = "Ingresa el monto de descuentos.")]
+        [Range(typeof(decimal), "0", "79228162514264337593543950335", ErrorMessage = "Los descuentos deben ser mayores o iguales a 0.")]
+        public decimal? Discounts { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (TotalSales.HasValue && Discounts.HasValue && Discounts.Value > TotalSales.Value)
+            {
+                yield return new ValidationResult(
+                    "Los descuentos no pueden superar las ventas totales.",
+                    new[] { nameof(Discounts) });
+            }
+        }
+    }
+}

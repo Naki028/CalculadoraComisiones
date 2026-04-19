@@ -1,0 +1,84 @@
+:root {
+    --ink: #1d2a31;
+    --ink-muted: #475863;
+    --line: #d8e2ea;
+    --surface: #ffffff;
+    --surface-strong: rgba(255, 255, 255, 0.82);
+    --shadow-soft: 0 12px 26px rgba(22, 42, 56, 0.08);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    font-family: "Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at 10% 15%, rgba(15, 136, 184, 0.07) 0 25%, transparent 45%),
+        radial-gradient(circle at 85% 0%, rgba(252, 165, 34, 0.09) 0 18%, transparent 40%),
+        #f4f8fb;
+}
+
+h1:focus,
+h2:focus,
+h3:focus {
+    outline: none;
+}
+
+input,
+select,
+button,
+textarea {
+    font: inherit;
+}
+
+input,
+select {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.58rem 0.68rem;
+    background: #fff;
+    color: var(--ink);
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #53a3cb;
+    box-shadow: 0 0 0 3px rgba(67, 146, 188, 0.2);
+}
+
+.valid.modified:not([type=checkbox]) {
+    border-color: #2f8f53;
+}
+
+.invalid {
+    border-color: #cc3f3f;
+}
+
+.validation-message {
+    color: #b92f2f;
+    font-size: 0.85rem;
+}
+
+.validation-errors,
+.validation-summary-errors {
+    margin: 0 0 0.8rem;
+    padding: 0.65rem 0.8rem;
+    border-radius: 10px;
+    border: 1px solid #f2c0c0;
+    background: #fff0f0;
+    color: #8c2626;
+    font-size: 0.9rem;
+}

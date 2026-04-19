@@ -1,0 +1,134 @@
+.hero-card {
+    background: linear-gradient(135deg, #f9fbff 0%, #eaf4ff 45%, #fff6e6 100%);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1.2rem;
+    box-shadow: var(--shadow-soft);
+}
+
+.hero-card h2 {
+    margin: 0;
+    font-size: 1.45rem;
+    color: var(--ink);
+}
+
+.hero-card p {
+    margin: 0.6rem 0 0;
+    color: var(--ink-muted);
+}
+
+.workspace-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1rem;
+    box-shadow: var(--shadow-soft);
+}
+
+.panel h3 {
+    margin: 0 0 0.85rem;
+    color: var(--ink);
+}
+
+.field-grid {
+    display: grid;
+    gap: 0.4rem;
+    margin-bottom: 0.9rem;
+}
+
+.field-grid label {
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+    font-weight: 600;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+}
+
+.btn-primary,
+.btn-secondary {
+    border: none;
+    border-radius: 10px;
+    padding: 0.62rem 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+}
+
+.btn-primary {
+    color: #fff;
+    background: linear-gradient(120deg, #0f6d9f 0%, #0f88b8 100%);
+    box-shadow: 0 8px 18px rgba(15, 109, 159, 0.26);
+}
+
+.btn-secondary {
+    color: #1a3140;
+    background: #edf4f8;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+    transform: translateY(-1px);
+}
+
+.placeholder {
+    margin: 0;
+    color: var(--ink-muted);
+}
+
+.result-grid {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem 0.9rem;
+}
+
+.result-grid dt {
+    color: var(--ink-muted);
+    font-weight: 600;
+}
+
+.result-grid dd {
+    margin: 0;
+    text-align: right;
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.result-grid .amount {
+    color: #0f6d9f;
+    font-size: 1.1rem;
+}
+
+.formula {
+    margin: 1rem 0 0;
+    color: var(--ink-muted);
+    font-size: 0.92rem;
+}
+
+.service-error {
+    margin: 0;
+    border-radius: 10px;
+    padding: 0.55rem 0.7rem;
+    background: #ffeceb;
+    color: #7e1913;
+    border: 1px solid #f2b2ad;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+    .workspace-grid {
+        grid-template-columns: 1fr;
+    }
+}
